@@ -7,7 +7,7 @@ class Route
     private $uri;
     private $view;
 
-    public function __construct(string $method, string $uri, array $view)
+    public function __construct(string $method, string $uri, array|\Closure $view)
     {
         $this->method = $method;
         $this->uri = $uri;
@@ -21,6 +21,10 @@ class Route
 
     public function execute(Request $request)
     {
-        call_user_func($this->view, $request);
+        if (is_array($this->view)) {
+            call_user_func($this->view, $request);
+        } else {
+            $this->view->call($this);
+        }
     }
 }

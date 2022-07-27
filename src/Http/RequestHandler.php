@@ -3,18 +3,12 @@ namespace ProductList\Http;
 
 class RequestHandler
 {
-    private $index;
     private $request;
     private $routes;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
-    }
-
-    public function setIndex($index)
-    {
-        $this->index = $index;
     }
 
     public function registerRoutes(array $routes)
@@ -31,6 +25,6 @@ class RequestHandler
             }
         }
 
-        readfile($this->index);
+        http_response_code(404);
     }
 }
