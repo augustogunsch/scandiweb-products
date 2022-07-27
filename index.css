@@ -14,6 +14,10 @@ body {
 	margin: 0 1em;
 }
 
+#buttons a {
+	align-self: center;
+}
+
 #buttons button {
 	font-family: cursive;
 	padding: .5em 1em;

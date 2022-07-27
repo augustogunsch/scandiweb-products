@@ -4,6 +4,8 @@ const loadItems = () => {
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onload = function() {
+		console.log(this.responseText);
+
 		const products = JSON.parse(this.responseText);
 
 		const boxes = products.map(product =>
@@ -15,14 +17,31 @@ const loadItems = () => {
 					${product.price} $<br>
 					${product.attribute}
 				</p>
-			 </div>
-		`)
+			 </div>`
+		)
 
 		productsList.innerHTML = boxes.join('\n');
 	}
 
-	xhttp.open('GET', 'view/products.php', true);
+	xhttp.open('GET', 'src/View/Product', true);
+	xhttp.send();
+}
+loadItems();
+
+const deleteSelected = () => {
+	const checkboxes = document.querySelectorAll('input[class="delete-checkbox"]:checked');
+	let values = [];
+	checkboxes.forEach(checkbox => values.push(checkbox.value));
+
+	const xhttp = new XMLHttpRequest();
+
+	xhttp.onload = function() {
+		loadItems();
+	}
+
+	xhttp.open('DELETE', 'src/View/Product', true);
 	xhttp.send();
 }
 
-loadItems();
+const deleteButton = document.getElementById('delete-product-btn');
+deleteButton.addEventListener('click', deleteSelected);
