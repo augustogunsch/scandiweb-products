@@ -13,12 +13,8 @@
 				<button id="delete-product-btn">MASS DELETE</button>
 			</div>
 		</div>
-<?php
-require 'model/product.php';
-
-$products = Product::selectAll();
-// TODO
-echo json_encode($products);
-?>
+		<div id="products">
+		</div>
 	</body>
+	<script src="index.js"></script>
 </html>

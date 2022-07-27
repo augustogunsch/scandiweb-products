@@ -86,6 +86,7 @@ abstract class Product implements JsonSerializable {
 
 	public function jsonSerialize() : mixed {
 		return [
+			'id' => $this->getProductId(),
 			'sku' => $this->getSKU(),
 			'name' => $this->getName(),
 			'price' => $this->getPrice(),
