@@ -4,8 +4,6 @@ const loadItems = () => {
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onload = function() {
-		console.log(this.responseText);
-
 		const products = JSON.parse(this.responseText);
 
 		const boxes = products.map(product =>
@@ -23,7 +21,7 @@ const loadItems = () => {
 		productsList.innerHTML = boxes.join('\n');
 	}
 
-	xhttp.open('GET', 'src/View/Product', true);
+	xhttp.open('GET', 'products', true);
 	xhttp.send();
 }
 loadItems();
@@ -39,7 +37,7 @@ const deleteSelected = () => {
 		loadItems();
 	}
 
-	xhttp.open('DELETE', 'src/View/Product', true);
+	xhttp.open('DELETE', 'products', true);
 	xhttp.send();
 }
 
