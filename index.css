@@ -1,0 +1,14 @@
+#header {
+	display: flex;
+	justify-content: space-between;
+}
+
+#buttons {
+	display: flex;
+}
+
+#buttons button {
+	height: 2em;
+	margin: 1em;
+	align-self: center;
+}
