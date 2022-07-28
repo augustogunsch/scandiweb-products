@@ -1,6 +1,8 @@
 <?php
 namespace ProductList\Model;
 
+use ProductList\Exception\NotFoundException;
+
 abstract class Product implements \JsonSerializable
 {
     use Model;
@@ -44,6 +46,11 @@ abstract class Product implements \JsonSerializable
         return $this->productId;
     }
 
+    public function getVariationId()
+    {
+        return $this->variationId;
+    }
+
     public function setVariationId($id)
     {
         $this->variationId = $id;
@@ -56,6 +63,43 @@ abstract class Product implements \JsonSerializable
 
     abstract public function getFormatedAttr();
 
+    public function delete($conn = null)
+    {
+        if ($conn === null) {
+            $conn = Database::connect();
+        }
+
+        $productId = $this->getProductId();
+        $stmt = $conn->prepare('DELETE FROM '.PRODUCT.' WHERE id = ?');
+        $stmt->bind_param('i', $productId);
+
+        if ($stmt->execute() === false) {
+            throw new \Exception("Unable to delete product with id '$id'");
+        }
+    }
+
+    public static function fromId($id, $conn = null) : self
+    {
+        if ($conn === null) {
+            $conn = Database::connect();
+        }
+
+        $stmt = $conn->prepare(self::getSelectAllQuery().' WHERE '.PRODUCT.'.id = ?');
+        $stmt->bind_param('i', $id);
+
+        if ($stmt->execute() === true) {
+            $row = $stmt->get_result()->fetch_assoc();
+
+            if($row === null) {
+                throw new NotFoundException("No product with id '$id'");
+            }
+
+            return self::fromRow($row);
+        } else {
+            throw new \Exception("Unable to select object");
+        }
+    }
+
     public static function fromRow($row) : self
     {
         if ($row['size'] !== null) {
@@ -65,7 +109,7 @@ abstract class Product implements \JsonSerializable
         } elseif ($row['height'] !== null) {
             return Furniture::fromRow($row);
         } else {
-            throw new Exception("Product without a type");
+            throw new \Exception("Product without a type");
         }
     }
 
@@ -77,7 +121,7 @@ abstract class Product implements \JsonSerializable
                 FROM '.PRODUCT.'
                 LEFT JOIN '.DVD.' ON '.PRODUCT.'.id = '.DVD.'.product_id
                 LEFT JOIN '.BOOK.' ON '.PRODUCT.'.id = '.BOOK.'.product_id
-                LEFT JOIN '.FURNITURE.' ON '.PRODUCT.'.id = '.FURNITURE.'.product_id;';
+                LEFT JOIN '.FURNITURE.' ON '.PRODUCT.'.id = '.FURNITURE.'.product_id';
     }
 
     public function insert($conn = null) : int
@@ -100,7 +144,7 @@ abstract class Product implements \JsonSerializable
             $this->setProductId($conn->insert_id);
             return $conn->insert_id;
         } else {
-            throw new Exception("Unable to insert object");
+            throw new \Exception("Unable to insert object");
         }
     }
 

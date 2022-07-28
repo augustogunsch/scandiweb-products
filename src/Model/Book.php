@@ -66,7 +66,24 @@ class Book extends Product
             $this->setVariationId($conn->insert_id);
             return $conn->insert_id;
         } else {
-            throw new Exception("Unable to insert object");
+            throw new \Exception("Unable to insert object");
         }
+    }
+
+    public function delete($conn = null)
+    {
+        if ($conn === null) {
+            $conn = Database::connect();
+        }
+
+        $variationId = $this->getVariationId();
+        $stmt = $conn->prepare('DELETE FROM '.BOOK.' WHERE id = ?');
+        $stmt->bind_param('i', $variationId);
+
+        if ($stmt->execute() === false) {
+            throw new \Exception("Unable to delete product with id '$id'");
+        }
+
+        parent::delete($conn);
     }
 }

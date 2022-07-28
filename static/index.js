@@ -37,7 +37,7 @@ const deleteSelected = () => {
 		loadItems();
 	}
 
-	xhttp.open('DELETE', 'products', true);
+	xhttp.open('DELETE', `products?id=${values.join(',')}`, true);
 	xhttp.send();
 }
 

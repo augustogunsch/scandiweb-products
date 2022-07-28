@@ -5,6 +5,7 @@ trait Model
 {
     abstract public static function fromRow($row) : self;
     abstract public function insert($conn = null) : int; // should return id
+    abstract public function delete($conn = null);
     abstract private static function getSelectAllQuery() : string;
 
     public static function selectAll($conn = null) : array

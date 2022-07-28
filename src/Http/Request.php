@@ -5,6 +5,7 @@ class Request
 {
     private $method;
     private $uri;
+    private $queryString;
 
     public function getMethod()
     {
@@ -16,9 +17,19 @@ class Request
         return $this->uri;
     }
 
+    public function getQueryString()
+    {
+        return $this->queryString;
+    }
+
     public function __construct(array $params)
     {
-        $this->uri = basename($params['REQUEST_URI']);
+        $uri_base = trim($params['REQUEST_URI'], '?'.$params['QUERY_STRING']);
+        $uri_base = trim(urldecode($uri_base), '/');
+        $this->uri = explode('/', $uri_base);
+
         $this->method = $params['REQUEST_METHOD'];
+
+        parse_str($params['QUERY_STRING'], $this->queryString);
     }
 }

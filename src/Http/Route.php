@@ -10,7 +10,7 @@ class Route
     public function __construct(string $method, string $uri, array|\Closure $view)
     {
         $this->method = $method;
-        $this->uri = $uri;
+        $this->uri = explode('/', $uri);
         $this->view = $view;
     }
 

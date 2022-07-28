@@ -69,4 +69,21 @@ class DVD extends Product
             throw new Exception("Unable to insert object");
         }
     }
+
+    public function delete($conn = null)
+    {
+        if ($conn === null) {
+            $conn = Database::connect();
+        }
+
+        $variationId = $this->getVariationId();
+        $stmt = $conn->prepare('DELETE FROM '.DVD.' WHERE id = ?');
+        $stmt->bind_param('i', $variationId);
+
+        if ($stmt->execute() === false) {
+            throw new \Exception("Unable to delete product with id '$id'");
+        }
+
+        parent::delete($conn);
+    }
 }

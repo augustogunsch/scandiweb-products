@@ -9,7 +9,8 @@ $request = new Request($_SERVER);
 $handler = new RequestHandler($request);
 
 $handler->registerRoutes([
-    new Route('GET', 'products', ['ProductList\View\Product', 'listAll']),
+    new Route('GET', 'products', ['ProductList\View\Product', 'list']),
+    new Route('DELETE', 'products', ['ProductList\View\Product', 'delete']),
     new Route('GET', 'add-product', function() { readfile('static/add-product.html'); }),
     new Route('GET', '', function() { readfile('static/index.html'); }),
 ]);
