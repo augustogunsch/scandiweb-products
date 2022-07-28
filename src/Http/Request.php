@@ -5,7 +5,8 @@ class Request
 {
     private $method;
     private $uri;
-    private $queryString;
+    private $queryParams;
+    private $formParams;
 
     public function getMethod()
     {
@@ -17,19 +18,25 @@ class Request
         return $this->uri;
     }
 
-    public function getQueryString()
+    public function getQueryParams()
     {
-        return $this->queryString;
+        return $this->queryParams;
     }
 
-    public function __construct(array $params)
+    public function getFormParams()
     {
-        $uri_base = trim($params['REQUEST_URI'], '?'.$params['QUERY_STRING']);
+        return $this->formParams;
+    }
+
+    public function __construct(array $params, array $queryParams, array $formParams)
+    {
+        $uri_base = strtok($params['REQUEST_URI'], '?');
         $uri_base = trim(urldecode($uri_base), '/');
         $this->uri = explode('/', $uri_base);
 
         $this->method = $params['REQUEST_METHOD'];
 
-        parse_str($params['QUERY_STRING'], $this->queryString);
+        $this->queryParams = $queryParams;
+        $this->formParams = $formParams;
     }
 }

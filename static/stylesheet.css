@@ -14,16 +14,15 @@ body {
 	margin: 0 1em;
 }
 
-#buttons a {
+.header-button {
 	align-self: center;
+	margin: 0 2em;
 }
 
 #buttons button {
 	font-family: cursive;
 	padding: .5em 1em;
 	font-size: 1rem;
-	margin: 0 2em;
-	align-self: center;
 	background-color: white;
 	border: 2px solid black;
 	box-shadow: 2px 2px black;
@@ -55,4 +54,24 @@ body {
 	border: 1px solid black;
 	position: absolute;
 	top: 0px;
+}
+
+.hidden {
+	display: none;
+}
+
+#main {
+	margin: 2em;
+}
+
+.form-section {
+	margin: 2em;
+}
+
+td:nth-child(2) {
+	padding-left: 2em;
+}
+
+#productType {
+	margin-left: 2em;
 }

@@ -20,7 +20,12 @@ class RequestHandler
     {
         foreach ($this->routes as $route) {
             if ($route->matches($this->request)) {
-                $route->execute($this->request);
+                try {
+                    $route->execute($this->request);
+                } catch (\Exception $e) {
+                    http_response_code(500);
+                    echo $e->getMessage();
+                }
                 return;
             }
         }
