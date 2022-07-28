@@ -10,8 +10,8 @@ $handler = new RequestHandler($request);
 
 $handler->registerRoutes([
     new Route('GET', 'products', ['ProductList\View\Product', 'listAll']),
-    new Route('GET', 'add-product', function() { readfile('add-product.html'); }),
-    new Route('GET', '', function() { readfile('index.html'); }),
+    new Route('GET', 'add-product', function() { readfile('static/add-product.html'); }),
+    new Route('GET', '', function() { readfile('static/index.html'); }),
 ]);
 
 $handler->handle();
