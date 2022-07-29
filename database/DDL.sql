@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS `products`;
+
 CREATE DATABASE `products`;
 
 USE `products`;
@@ -9,7 +11,7 @@ CREATE TABLE `product` (
   `sku` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`)
-)
+);
 
 CREATE TABLE `book` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -18,7 +20,7 @@ CREATE TABLE `book` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `book_UN` (`product_id`),
   CONSTRAINT `book_FK` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
-)
+);
 
 CREATE TABLE `dvd` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -27,7 +29,7 @@ CREATE TABLE `dvd` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `dvd_UN` (`product_id`),
   CONSTRAINT `dvd_FK` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
-)
+);
 
 CREATE TABLE `furniture` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -38,5 +40,4 @@ CREATE TABLE `furniture` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `furniture_UN` (`product_id`),
   CONSTRAINT `furniture_FK` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
-)
-
+);
