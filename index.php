@@ -1,5 +1,7 @@
 <?php
 require 'autoload.php';
+ini_set('display_errors', true);
+ini_set('error_log', '/tmp/php.log');
 
 use ProductList\Http\Request;
 use ProductList\Http\RequestHandler;

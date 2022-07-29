@@ -1,6 +1,8 @@
 <?php
 namespace ProductList\Model;
 
+use ProductList\Exception\InvalidFieldException;
+
 class Furniture extends Product
 {
     private $height;
@@ -8,7 +10,7 @@ class Furniture extends Product
     private $length;
 
     public function __construct(
-        $SKU,
+        $sku,
         $name,
         $price,
         $height,
@@ -17,7 +19,20 @@ class Furniture extends Product
         $productId = null,
         $variationId = null
     ) {
-        parent::__construct($SKU, $name, $price, $productId, $variationId);
+        parent::__construct($sku, $name, $price, $productId, $variationId);
+
+        if (empty($height) || !is_numeric($height)) {
+            throw new InvalidFieldException('Height');
+        }
+
+        if (empty($width) || !is_numeric($width)) {
+            throw new InvalidFieldException('Width');
+        }
+
+        if (empty($length) || !is_numeric($length)) {
+            throw new InvalidFieldException('Length');
+        }
+
         $this->height = $height;
         $this->width = $width;
         $this->length = $length;
@@ -32,8 +47,8 @@ class Furniture extends Product
             $row['height'],
             $row['width'],
             $row['length'],
-            $row['product_id'],
-            $row['variation_id']
+            $row['productId'],
+            $row['variationId']
         );
     }
 
@@ -62,9 +77,17 @@ class Furniture extends Product
 
     private static function getSelectAllQuery() : string
     {
-        return 'SELECT '.PRODUCT.'.*, '.FURNITURE.'.id as variation_id, size
-            FROM '.PRODUCT.'
-            LEFT JOIN '.FURNITURE.' ON '.PRODUCT.'.id = '.FURNITURE.'.product_id';
+        return '
+        SELECT
+                '.PRODUCT.'.*,
+                '.FURNITURE.'.id as variationId,
+                height,
+                width,
+                length
+        FROM
+                '.PRODUCT.'
+        LEFT JOIN '.FURNITURE.' ON
+                '.PRODUCT.'.id = '.FURNITURE.'.product_id';
     }
 
     public function insert($conn = null) : int
@@ -107,7 +130,7 @@ class Furniture extends Product
         $stmt->bind_param('i', $variationId);
 
         if ($stmt->execute() === false) {
-            throw new \Exception("Unable to delete product with id '$id'");
+            throw new \Exception("Unable to delete product with id '$variationId'");
         }
 
         parent::delete($conn);

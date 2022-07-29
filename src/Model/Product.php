@@ -2,33 +2,49 @@
 namespace ProductList\Model;
 
 use ProductList\Exception\NotFoundException;
+use ProductList\Exception\InvalidFieldException;
+use ProductList\Exception\DuplicateException;
 
 abstract class Product implements \JsonSerializable
 {
     use Model;
     private $variationId;
-    private $SKU;
+    private $sku;
     private $name;
     private $price;
     private $productId;
 
     public function __construct(
-        $SKU,
+        $sku,
         $name,
         $price,
         $productId = null,
         $variationId = null
     ) {
+        if (empty($sku)) {
+            throw new InvalidFieldException('SKU');
+        }
+
+        if (empty($name)) {
+            throw new InvalidFieldException('Name');
+        }
+
+        if (empty($price) || !is_numeric($price)) {
+            throw new InvalidFieldException('Price');
+        }
+
         $this->productId = $productId;
         $this->variationId = $variationId;
-        $this->SKU = $SKU;
+
+
+        $this->sku = $sku;
         $this->name = $name;
         $this->price = $price;
     }
 
     public function getSKU()
     {
-        return $this->SKU;
+        return $this->sku;
     }
 
     public function getName()
@@ -74,7 +90,7 @@ abstract class Product implements \JsonSerializable
         $stmt->bind_param('i', $productId);
 
         if ($stmt->execute() === false) {
-            throw new \Exception("Unable to delete product with id '$id'");
+            throw new \Exception("Unable to delete product with id '$productId'");
         }
     }
 
@@ -102,26 +118,45 @@ abstract class Product implements \JsonSerializable
 
     public static function fromRow($row) : self
     {
-        if ($row['size'] !== null) {
-            return DVD::fromRow($row);
-        } elseif ($row['weight'] !== null) {
-            return Book::fromRow($row);
-        } elseif ($row['height'] !== null) {
-            return Furniture::fromRow($row);
-        } else {
-            throw new \Exception("Product without a type");
+        switch ($row['productType']) {
+            case 'dvd':
+                return DVD::fromRow($row);
+            case 'book':
+                return Book::fromRow($row);
+            case 'furniture':
+                return Furniture::fromRow($row);
+            default:
+                throw new \Exception("Product without a type");
         }
     }
 
     private static function getSelectAllQuery() : string
     {
-        return 'SELECT '.PRODUCT.'.id as product_id,
-                    COALESCE('.DVD.'.id, '.BOOK.'.id, '.FURNITURE.'.id) as variation_id,
-                    name, sku, price, size, weight, width, height, length
-                FROM '.PRODUCT.'
-                LEFT JOIN '.DVD.' ON '.PRODUCT.'.id = '.DVD.'.product_id
-                LEFT JOIN '.BOOK.' ON '.PRODUCT.'.id = '.BOOK.'.product_id
-                LEFT JOIN '.FURNITURE.' ON '.PRODUCT.'.id = '.FURNITURE.'.product_id';
+        return '
+        SELECT
+                '.PRODUCT.'.id as productId,
+                name,
+                sku,
+                price,
+                size,
+                weight,
+                width,
+                height,
+                length,
+                COALESCE('.DVD.'.id, '.BOOK.'.id, '.FURNITURE.'.id) as variationId,
+                CASE
+                        WHEN '.DVD.'.id IS NOT NULL THEN "dvd"
+                        WHEN '.BOOK.'.id IS NOT NULL THEN "book"
+                        WHEN '.FURNITURE.'.id IS NOT NULL THEN "furniture"
+                END as productType
+        FROM
+                '.PRODUCT.'
+        LEFT JOIN '.DVD.' ON
+                '.PRODUCT.'.id = '.DVD.'.product_id
+        LEFT JOIN '.BOOK.' ON
+                '.PRODUCT.'.id = '.BOOK.'.product_id
+        LEFT JOIN '.FURNITURE.' ON
+                '.PRODUCT.'.id = '.FURNITURE.'.product_id';
     }
 
     public function insert($conn = null) : int
@@ -140,11 +175,19 @@ abstract class Product implements \JsonSerializable
         );
         $stmt->bind_param('ssd', $SKU, $name, $price);
 
-        if ($stmt->execute() === true) {
-            $this->setProductId($conn->insert_id);
-            return $conn->insert_id;
-        } else {
-            throw new \Exception("Unable to insert object");
+        try {
+            if ($stmt->execute() === true) {
+                $this->setProductId($conn->insert_id);
+                return $conn->insert_id;
+            } else {
+                throw new \Exception("Unable to insert object");
+            }
+        } catch (\mysqli_sql_exception $e) {
+            if ($e->getCode() === 1062) {
+                throw new DuplicateException('The provided SKU is already registered.');
+            } else {
+                throw $e;
+            }
         }
     }
 

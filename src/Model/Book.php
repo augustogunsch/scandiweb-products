@@ -1,6 +1,8 @@
 <?php
 namespace ProductList\Model;
 
+use ProductList\Exception\InvalidFieldException;
+
 class Book extends Product
 {
     private $weight;
@@ -14,6 +16,11 @@ class Book extends Product
         $variationId = null
     ) {
         parent::__construct($sku, $name, $price, $productId, $variationId);
+
+        if (empty($weight) || !is_numeric($weight)) {
+            throw new InvalidFieldException('Weight');
+        }
+
         $this->weight = $weight;
     }
 
@@ -24,8 +31,8 @@ class Book extends Product
             $row['name'],
             $row['price'],
             $row['weight'],
-            $row['product_id'],
-            $row['variation_id']
+            $row['productId'],
+            $row['variationId']
         );
     }
 
@@ -42,8 +49,15 @@ class Book extends Product
 
     private static function getSelectAllQuery() : string
     {
-        return 'SELECT '.PRODUCT.'.*, '.BOOK.'.id as variation_id, size
-            FROM '.PRODUCT.' LEFT JOIN '.BOOK.' ON '.PRODUCT.'.id = '.BOOK.'.product_id';
+        return '
+        SELECT
+                '.PRODUCT.'.*,
+                '.BOOK.'.id as variationId,
+                weight
+        FROM
+                '.PRODUCT.'
+        LEFT JOIN
+                '.BOOK.' ON '.PRODUCT.'.id = '.BOOK.'.product_id';
     }
 
     public function insert($conn = null) : int
@@ -81,7 +95,7 @@ class Book extends Product
         $stmt->bind_param('i', $variationId);
 
         if ($stmt->execute() === false) {
-            throw new \Exception("Unable to delete product with id '$id'");
+            throw new \Exception("Unable to delete product with id '$variationId'");
         }
 
         parent::delete($conn);

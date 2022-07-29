@@ -29,12 +29,16 @@ $('#delete-product-btn').on('click', () => {
     const checkboxes = document.querySelectorAll('input[class="delete-checkbox"]:checked');
     checkboxes.forEach(checkbox => values.push(checkbox.value));
 
-    $.ajax(
-        `product?id=${values.join(',')}`,
-        {
-            method: 'DELETE',
-            success: loadItems,
-            error: jqXHR => alert(jqXHR.responseText),
-        }
-    )
+    if(values.length) {
+        $.ajax(
+            `product?id=${values.join(',')}`,
+            {
+                method: 'DELETE',
+                success: loadItems,
+                error: jqXHR => alert(jqXHR.responseText),
+            }
+        )
+    } else {
+        alert('Please select a product.');
+    }
 });

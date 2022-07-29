@@ -1,6 +1,8 @@
 <?php
 namespace ProductList\Model;
 
+use ProductList\Exception\InvalidFieldException;
+
 class DVD extends Product
 {
     private $size;
@@ -14,6 +16,11 @@ class DVD extends Product
         $variationId = null
     ) {
         parent::__construct($sku, $name, $price, $productId, $variationId);
+
+        if (empty($size) || !is_numeric($size)) {
+            throw new InvalidFieldException('Size');
+        }
+
         $this->size = $size;
     }
 
@@ -24,8 +31,8 @@ class DVD extends Product
             $row['name'],
             $row['price'],
             $row['size'],
-            $row['product_id'],
-            $row['variation_id']
+            $row['productId'],
+            $row['variationId']
         );
     }
 
@@ -42,8 +49,15 @@ class DVD extends Product
 
     private static function getSelectAllQuery() : string
     {
-        return 'SELECT '.PRODUCT.'.*, '.DVD.'.id as variation_id, size
-            FROM '.PRODUCT.' LEFT JOIN '.DVD.' ON '.PRODUCT.'.id = '.DVD.'.product_id';
+        return '
+        SELECT
+                '.PRODUCT.'.*,
+                '.DVD.'.id as variationId,
+                size
+        FROM
+                '.PRODUCT.'
+        LEFT JOIN
+                '.DVD.' ON '.PRODUCT.'.id = '.DVD.'.product_id';
     }
 
     public function insert($conn = null) : int
@@ -66,7 +80,7 @@ class DVD extends Product
             $this->setVariationId($conn->insert_id);
             return $conn->insert_id;
         } else {
-            throw new Exception("Unable to insert object");
+            throw new \Exception("Unable to insert object");
         }
     }
 
@@ -81,7 +95,7 @@ class DVD extends Product
         $stmt->bind_param('i', $variationId);
 
         if ($stmt->execute() === false) {
-            throw new \Exception("Unable to delete product with id '$id'");
+            throw new \Exception("Unable to delete product with id '$variationId'");
         }
 
         parent::delete($conn);

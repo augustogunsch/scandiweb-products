@@ -3,9 +3,6 @@ namespace ProductList\View;
 
 use ProductList\Http\Request;
 use ProductList\Model\Product as ProductModel;
-use ProductList\Model\DVD;
-use ProductList\Model\Furniture;
-use ProductList\Model\Book;
 use ProductList\Exception\NotFoundException;
 
 class Product extends View
@@ -38,7 +35,7 @@ class Product extends View
 
                 } catch (NotFoundException $e) {
                     http_response_code(404);
-                    echo $e->getMessage();
+                    echo "The selected(s) object(s) is(are) not available anymore.";
                     return;
                 }
             }
@@ -63,55 +60,12 @@ class Product extends View
             'length'
         ];
         if (self::expectArgs($expected, $params)) {
-            $product = null;
-            $type = $params['productType'];
+            $params['productId'] = null;
+            $params['variationId'] = null;
 
-            switch($type) {
-                case 'dvd':
-                    $product = new DVD(
-                        $params['sku'],
-                        $params['name'],
-                        $params['price'],
-                        $params['size'],
-                    );
-                    break;
-                case 'furniture':
-                    $product = new Furniture(
-                        $params['sku'],
-                        $params['name'],
-                        $params['price'],
-                        $params['height'],
-                        $params['width'],
-                        $params['length'],
-                    );
-                    break;
-                case 'book':
-                    $product = new Book(
-                        $params['sku'],
-                        $params['name'],
-                        $params['price'],
-                        $params['weight'],
-                    );
-                    break;
-                default:
-                    http_response_code(400);
-                    echo "Invalid 'productType' value '$type'";
-                    return;
-            }
+            $product = ProductModel::fromRow($params);
 
-            //try {
-                $product->insert();
-            //} catch (\Exception $e) {
-
-            //}
-        }
-    }
-
-    public static function test(Request $request)
-    {
-        $params= $request->getQueryParams();
-        if (self::expectArgs(['testarg'], $params)) {
-            echo var_dump($params);
+            $product->insert();
         }
     }
 }
