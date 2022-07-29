@@ -74,7 +74,7 @@ class DVD extends Product
         $size = $this->getSize();
 
         $stmt = $conn->prepare("INSERT INTO ".DVD." (product_id, size) VALUES (?, ?);");
-        $stmt->bind_param('ii', $productId, $size);
+        $stmt->bind_param('id', $productId, $size);
 
         if ($stmt->execute() === true) {
             $this->setVariationId($conn->insert_id);

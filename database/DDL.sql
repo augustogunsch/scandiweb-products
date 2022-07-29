@@ -25,7 +25,7 @@ CREATE TABLE `book` (
 CREATE TABLE `dvd` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `product_id` int unsigned NOT NULL,
-  `size` int unsigned NOT NULL,
+  `size` float NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `dvd_UN` (`product_id`),
   CONSTRAINT `dvd_FK` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
