@@ -8,15 +8,10 @@ define("FURNITURE", "furniture");
 
 class Database
 {
-    const SERVERNAME = "127.0.0.1";
-    const DATABASE = "scandiweb";
-    const USERNAME = "root";
-    const PASSWORD = "root";
-
     public static function connect()
     {
-        $conn = new \mysqli(self::SERVERNAME, self::USERNAME, self::PASSWORD);
-        $conn->select_db(self::DATABASE);
+        $conn = new \mysqli(getenv('SERVERNAME'), getenv('USERNAME'), getenv('PASSWORD'));
+        $conn->select_db(getenv('DATABASE'));
         return $conn;
     }
 }
